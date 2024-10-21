@@ -1,0 +1,355 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Auction API",
+    "description": "API for managing auctions and bids"
+  },
+  "host": "localhost:5000",
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "summary": "Register a new user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login a user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User login data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged in successfully"
+          }
+        }
+      }
+    },
+    "/auctions": {
+      "post": {
+        "summary": "Create a new auction",
+        "description": "Create a new auction item. Requires authentication.",
+        "tags": ["Auctions"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "auction",
+            "description": "Auction details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Auction"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token for authentication",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Auction created successfully"
+          },
+          "400": {
+            "description": "Bad request - Validation failed"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all auctions",
+        "description": "Retrieve a list of all auction items.",
+        "tags": ["Auctions"],
+        "responses": {
+          "200": {
+            "description": "List of all auctions",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Auction"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auctions/{id}": {
+      "get": {
+        "summary": "Get an auction by ID",
+        "description": "Retrieve a specific auction by its ID.",
+        "tags": ["Auctions"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Auction ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auction details",
+            "schema": {
+              "$ref": "#/definitions/Auction"
+            }
+          },
+          "404": {
+            "description": "Auction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an auction",
+        "description": "Update an auction item. Requires authentication and ownership of the auction.",
+        "tags": ["Auctions"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Auction ID",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "auction",
+            "description": "Updated auction details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Auction"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token for authentication",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auction updated successfully"
+          },
+          "400": {
+            "description": "Bad request - Validation failed"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Auction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an auction",
+        "description": "Delete an auction item. Requires authentication and ownership of the auction.",
+        "tags": ["Auctions"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Auction ID",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token for authentication",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auction deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Auction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auctions/{id}/bid": {
+      "post": {
+        "summary": "Place a bid on an auction",
+        "description": "Place a bid on a specific auction item. Requires authentication.",
+        "tags": ["Bidding"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Auction ID",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "bid",
+            "description": "Bid details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Bid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token for authentication",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Bid placed successfully"
+          },
+          "400": {
+            "description": "Bad request - Bid is lower than the current highest bid"
+          },
+          "404": {
+            "description": "Auction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auctions/{id}/bids": {
+      "get": {
+        "summary": "Get bid history for an auction",
+        "description": "Retrieve the bid history for a specific auction item.",
+        "tags": ["Bidding"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Auction ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bid history",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Bid"
+              }
+            }
+          },
+          "404": {
+            "description": "Auction not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "Auction": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "startingBid": {
+          "type": "number"
+        },
+        "currentBid": {
+          "type": "number"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Bid": {
+      "type": "object",
+      "properties": {
+        "bidAmount": {
+          "type": "number"
+        },
+        "user": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
